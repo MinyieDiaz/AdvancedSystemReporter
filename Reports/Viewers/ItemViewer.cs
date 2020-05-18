@@ -119,23 +119,24 @@ namespace ASR.Reports.Items
         protected virtual Item GetCorrectVersion(Item itemElement)
         {
             if (string.IsNullOrEmpty(Version)) return itemElement;
-
+            var item = itemElement.Database.GetItem(itemElement.ID, itemElement.Language);
+            var itemVersions = item.Versions.GetVersionNumbers();
             switch (Version)
             {
                 case "first" :
-                    return itemElement.Database.GetItem(itemElement.ID, itemElement.Language, new Sitecore.Data.Version(1));
+                    return itemElement.Database.GetItem(itemElement.ID, itemElement.Language, itemVersions.First(x => x.Number == 1));
                 case "latest" :
                     return itemElement.Versions.GetLatestVersion();
                 case "previous":
                     if (itemElement.Version.Number > 1)
                     {
-                        return itemElement.Database.GetItem(itemElement.ID, itemElement.Language, new Sitecore.Data.Version(itemElement.Version.Number - 1));
+                        return itemElement.Database.GetItem(itemElement.ID, itemElement.Language, itemVersions.First(x => x.Number == (item.Version.Number -1)));
                     }
                     return itemElement;
                 case "next":
                     if (!itemElement.Versions.IsLatestVersion())
                     {
-                        return itemElement.Database.GetItem(itemElement.ID, itemElement.Language, new Sitecore.Data.Version(itemElement.Version.Number + 1));
+                        return itemElement.Database.GetItem(itemElement.ID, itemElement.Language, itemVersions.First(x => x.Number == (item.Version.Number + 1)));
                     }
                     return itemElement;                
             }

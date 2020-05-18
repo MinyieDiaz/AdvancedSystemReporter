@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ASR.Reports.Logs
 {
@@ -27,12 +28,13 @@ namespace ASR.Reports.Logs
         {
             Match match = Regex.Match(Message, @"(?<db>\w+):(?<path>[^,]+), language: (?<language>[^,]+), version: (?<version>[^,]+), id: (?<id>\{.{36}\}).*");
             if (!match.Success) return null;
-
-            Sitecore.Data.Version version = new Sitecore.Data.Version(match.Groups["version"].Value);
+            var versionNumber = int.Parse(match.Groups["version"].Value);
+            var item = Sitecore.Context.Database.GetItem(Sitecore.Data.ID.Parse(match.Groups["id"].Value));
+            var currentVersion = item.Versions.GetVersionNumbers().First(x => x.Number == versionNumber);
             Sitecore.Globalization.Language language = Sitecore.Globalization.Language.Parse(match.Groups["language"].Value);
             Sitecore.Data.ID id = Sitecore.Data.ID.Parse(match.Groups["id"].Value);
             Sitecore.Data.Database db = Sitecore.Data.Database.GetDatabase(match.Groups["db"].Value);
-            return new Sitecore.Data.ItemUri(id, language, version, db);
+            return new Sitecore.Data.ItemUri(id, language, currentVersion, db);
         }
        
     }

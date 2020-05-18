@@ -99,7 +99,7 @@ namespace ASR.Reports.Scanners
 			{
 				var events = from wEvent in workflow.GetHistory(item)
 							 orderby wEvent.Date ascending
-							 select new ItemWorkflowEvent(wEvent.OldState, wEvent.NewState, wEvent.Text, wEvent.User, wEvent.Date)
+							 select new ItemWorkflowEvent(wEvent.OldState, wEvent.NewState, string.Join("|",wEvent.CommentFields.Values), wEvent.User, wEvent.Date)
 							 {
 								 Item = item
 							 };

@@ -68,7 +68,7 @@ namespace ASR.Export
         private static string GetColumnValue(DisplayElement row, IEnumerator<string> enumerator)
         {
             var value = row.GetColumnValue(enumerator.Current);
-            return value.Replace('\n', '|').Replace('\r', '|');
+            return value?.Replace('\n', '|')?.Replace('\r', '|') ?? string.Empty;
         }
     }
 }

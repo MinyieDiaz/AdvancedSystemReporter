@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Sitecore.Data;
 using Sitecore.Globalization;
 using Sitecore.Shell.Applications.ContentEditor;
@@ -32,9 +33,9 @@ namespace ASR.Controls
                 ViewState["ItemID"] = value;
             }
         }
-        public string ItemVersion
+        public int ItemVersion
         {
-            get { return StringUtil.GetString(ViewState["ItemVersion"]); }
+            get { return int.Parse(StringUtil.GetString(ViewState["ItemVersion"])); }
             set
             {
                 Assert.ArgumentNotNull(value, "value");
@@ -171,8 +172,10 @@ namespace ASR.Controls
 						value = string.Empty;
 					}                    
 					handle["value"] = value;
-				    handle["id"] =
-				        new ItemUri(Sitecore.Data.ID.Parse(ItemID), Language.Parse(ItemLanguage), new Version(ItemVersion),
+                    var item = Sitecore.Context.Database.GetItem(Sitecore.Data.ID.Parse(ItemID));
+                    var currentVersion = item.Versions.GetVersionNumbers().First(x => x.Number == ItemVersion);
+                    handle["id"] =
+				        new ItemUri(Sitecore.Data.ID.Parse(ItemID), Language.Parse(ItemLanguage), currentVersion,
 				                    Sitecore.Context.ContentDatabase).ToString(ItemUriFormat.Uri);
 					handle.Add(urlString);                    
                     SheerResponse.ShowModalDialog(urlString.ToString(), "800px", "500px", string.Empty, true);
